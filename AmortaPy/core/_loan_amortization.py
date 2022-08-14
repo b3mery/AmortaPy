@@ -1,11 +1,9 @@
 from __future__ import annotations
 
 import pandas as pd
-import numpy as np
-import numpy_financial as npf
 
 from ._constants import Constants as const
-from ._loan_functions import calculate_total_period_payment
+from ._loan_functions import calculate_total_period_payment, generate_amortization_schedule
 
 def repayment_frequency_name(repayment_frequency:int|float) -> str:
     """Return the repayment frequency name that corresponds to the number of periods.
@@ -57,18 +55,15 @@ class LoanAmortization:
     _loan_amount: int|float
     _years:int|float
     _n_peirods: int|float
-    _interest_compound_frequency:int|float = const.DAILY
     _effective_annual_interest_rate: float
     _df: pd.DataFrame
 
-    def __init__(self,nominal_annual_interest_rate:float, loan_amount:int|float, years:int|float, repayment_frequency:str|int|float|None = None, interest_compound_frequency:int|float|None = None) -> None:
+    def __init__(self,nominal_annual_interest_rate:float, loan_amount:int|float, years:int|float, repayment_frequency:str|int|float|None = None) -> None:
         self._nominal_annual_interest_rate = nominal_annual_interest_rate
         self._years = years
         self._loan_amount = loan_amount
         if repayment_frequency is not None:
             self.set_repayment_frequency_periods(repayment_frequency)
-        if interest_compound_frequency is not None:
-            self._interest_compound_frequency = interest_compound_frequency
         self._generate_amortization_schedule()
         self.calculate_effective_annual_interest_rate()
 
@@ -95,7 +90,7 @@ class LoanAmortization:
         * Interest compounded monthly `n=12`
         * Interest compounded daily `n=365`
         """
-        self._effective_annual_interest_rate = ((1 + (self._nominal_annual_interest_rate/self._interest_compound_frequency))**self._interest_compound_frequency) - 1
+        self._effective_annual_interest_rate = ((1 + (self._nominal_annual_interest_rate/self._repayment_frequency_periods))**self._repayment_frequency_periods) - 1
         return self
 
     def _get_repayment_frequency_periods(self, repayment_frequency:str|int|float|None) ->int:
@@ -145,29 +140,17 @@ class LoanAmortization:
         Returns:
             pd.DataFrame: The Loan Amortization Schedule of repayments in order of repayment
         """
-
-        mortgage_amount = -(self._loan_amount) 
         nominal_interest_rate_per_period = self._nominal_interest_rate_per_period(self.nominal_annual_interest_rate, self.repayment_frequency_periods)
         periods = self.calculate_number_of_periods(self.years, self.repayment_frequency_periods)
-        # Create Number of Periods Array
-        n_periods = np.arange(self.years * self.repayment_frequency_periods) + 1
 
-        interest_monthly = npf.ipmt(nominal_interest_rate_per_period, n_periods, periods, mortgage_amount)
-        principal_monthly = npf.ppmt(nominal_interest_rate_per_period, n_periods, periods, mortgage_amount)
-
-        df_initialize = list(zip(n_periods, interest_monthly, principal_monthly))
-        df = pd.DataFrame(df_initialize, columns=['period','interest','principal'])
-
-        df['period_payment'] = df['interest'] + df['principal']
-
+        df = generate_amortization_schedule(
+            self.loan_amount,
+            nominal_interest_rate_per_period,
+            periods
+        )
+        # calc running interest payable
         df['outstanding_interest']  = df['interest'].cumsum()
-        df['outstanding_principal']  = df['principal'].cumsum()
-
         df.outstanding_interest = df.outstanding_interest.values[::-1]
-        df.outstanding_principal = df.outstanding_principal.values[::-1]
-
-        df['outstanding_balance'] = df.period_payment.cumsum()
-        df.outstanding_balance = df.outstanding_balance.values[::-1]
 
         self._df = df
         return self
@@ -206,7 +189,7 @@ class LoanAmortization:
 
     @property
     def total_interest(self) ->float:
-        return self.amortization_schedule[:1].outstanding_interest[0]
+        return self._df['interest'].sum()
 
     @property
     def total_outstanding_balance(self) -> float:

@@ -97,7 +97,7 @@ def generate_amortization_schedule(loan_amount:int|float,
         'opening_balance' : [],
         'interest': [],
         'principal': [], 
-        'total_period_payment': [],
+        'period_payment': [],
         'closing_balance': []
     }
 
@@ -115,7 +115,7 @@ def generate_amortization_schedule(loan_amount:int|float,
         data['opening_balance'].append(opening_loan_balance)
         data['interest'].append(interest)
         data['principal'].append(principal)
-        data['total_period_payment'].append(total_payment_per_period)
+        data['period_payment'].append(total_payment_per_period)
         data['closing_balance'].append(round(closing_loan_balance, 6))
 
         opening_loan_balance = closing_loan_balance

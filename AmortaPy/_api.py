@@ -7,6 +7,5 @@ def generate_loan_amortization_schedule(
     nominal_annual_interest_rate:float,
     loan_amount:int|float,
     years:int|float,
-    repayment_frequency:str|int|float|None = None,
-    interest_compound_frequency:int|float|None = None) -> LoanAmortization:
-    return LoanAmortization(nominal_annual_interest_rate, loan_amount, years, repayment_frequency, interest_compound_frequency)
+    repayment_frequency:str|int|float|None = None) -> LoanAmortization:
+    return LoanAmortization(nominal_annual_interest_rate, loan_amount, years, repayment_frequency)
