@@ -5,6 +5,7 @@ import numpy as np
 import numpy_financial as npf
 
 from ._constants import Constants as const
+from ._loan_functions import calculate_total_period_payment
 
 def repayment_frequency_name(repayment_frequency:int|float) -> str:
     """Return the repayment frequency name that corresponds to the number of periods.
@@ -48,7 +49,6 @@ def repayment_frequency_periods(repayment_frequency:str) -> int:
     if repayment_frequency.lower() not in const.VALID_REPAYMENT_NAMES:
         raise ValueError(f'Repayment Frequency must be one of `{const.VALID_REPAYMENT_NAMES}`')
 
-
 class LoanAmortization:
     """Loan Amortization Schedule Calculator
     """
@@ -66,13 +66,21 @@ class LoanAmortization:
         self._years = years
         self._loan_amount = loan_amount
         if repayment_frequency is not None:
-            self.update_repayment_frequency_periods(repayment_frequency)
+            self.set_repayment_frequency_periods(repayment_frequency)
         if interest_compound_frequency is not None:
             self._interest_compound_frequency = interest_compound_frequency
         self._generate_amortization_schedule()
         self.calculate_effective_annual_interest_rate()
 
-    def update_repayment_frequency_periods(self, repayment_frequency:str|int|float):
+    def set_repayment_frequency_periods(self, repayment_frequency:str|int|float):
+        """Set/Update/Change the current repayment frequency peirods.
+
+        Args:
+            repayment_frequency (str | int | float): Valid repayment frequency
+
+        Returns:
+            self
+        """
         self._repayment_frequency_periods = self._get_repayment_frequency_periods(repayment_frequency)
         self._generate_amortization_schedule()
         return self
@@ -200,5 +208,30 @@ class LoanAmortization:
     def total_interest(self) ->float:
         return self.amortization_schedule[:1].outstanding_interest[0]
 
+    @property
+    def total_outstanding_balance(self) -> float:
+        return self.loan_amount + self.total_interest
+
+    @property
+    def total_interest_over_principal_per_cent(self) -> float:
+        return self.total_interest/self.loan_amount
+    
+    @property
+    def total_payment_per_period(self) -> float:
+        """Total Loan Payment Per Period
+
+        Returns:
+            float: Total Payment Per Peirod (Principal + Interest)
+        """
+        return calculate_total_period_payment(
+            self.loan_amount,
+            self._nominal_interest_rate_per_period(self.nominal_annual_interest_rate, self.repayment_frequency_periods), 
+            self._n_peirods
+         )
+    
+    def export_amortization_schedule_to_excel(self, export_path:str|bytes|None = None):
+        pass
+        # self.amortization_schedule.to_excel('')
+        
     # def __repr__(self) -> str:
     #     return str(self._df)
