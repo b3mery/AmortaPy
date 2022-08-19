@@ -1,5 +1,7 @@
+"""Constant variable module used through package.
+"""
 class Constants:
-    """Constant Variables
+    """Constant Variables to be used through package.
     """
     __slots__ = ()
     WEEKLY_PERIODS = 52 
@@ -13,3 +15,9 @@ class Constants:
     VALID_REPAYMENT_PERIODS = [WEEKLY_PERIODS, FORTNIGHTLY_PERIODS, MONTHLY_PERIODS]
     VALID_REPAYMENT_NAMES = [WEEKLY_NAME.lower(),FORTNIGHTLY_NAME.lower(), MONTHLY_NAME.lower()]
     YEARS = 30
+
+    # Loan Amort Inplace
+    INPLACE = True
+
+    # Default Export Path
+    EXCEL_EXPORT_PATH = './Amortization_Table.xlsx'

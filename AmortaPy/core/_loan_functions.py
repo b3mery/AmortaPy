@@ -67,7 +67,7 @@ def calculate_principal_and_interest_payment(total_period_payment:int|float,
         calculate_interest_payment(outstanding_loan_amount, nominal_interest_rate_per_period)
     )
 
-def generate_amortization_schedule(loan_amount:int|float,
+def generate_amortization_table(loan_amount:int|float,
                                    nominal_interest_rate_per_period:float,
                                    number_of_periods:int|float,
                                    total_payment_per_period: int|float|None=None,
