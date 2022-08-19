@@ -71,119 +71,7 @@ class LoanAmortization:
             self.set_repayment_frequency_periods(repayment_frequency)
         self._generate_amortization_schedule()
 
-    def set_repayment_frequency_periods(self, repayment_frequency:str|int|float, inplace:bool = const.INPLACE) -> LoanAmortization | Self:
-        """Set/Update/Change the current repayment frequency peirods.
-
-        Args:
-            repayment_frequency (str | int | float): Valid repayment frequency
-            inplace (bool, optional): Wether to update the instance or return new instance. Defaults to True, Updates Instance.
-
-        Returns:
-            LoanAmortization | Self
-        """
-        if inplace:
-            self._repayment_frequency_periods = self._get_repayment_frequency_periods(repayment_frequency)
-            return self._generate_amortization_schedule()
-        return self.copy().set_repayment_frequency_periods(repayment_frequency, inplace=True)
-        
-    def set_years(self, years:int|float, inplace:bool = const.INPLACE) -> LoanAmortization | Self:
-        """Update the loan years
-
-        Args:
-            years (int | float): Loan Repayment Years
-            inplace (bool, optional): Wether to update the instance or return new instance. Defaults to True, Updates Instance.
-
-        Returns:
-            LoanAmortization | Self
-        """
-        if inplace:
-            self._years = years
-            return self._generate_amortization_schedule()
-        return self.copy().set_years(years, inplace=True)
-
-    def set_nominal_annual_interest_rate(self, nominal_annual_interest_rate:float, inplace:bool = const.INPLACE) -> LoanAmortization | Self:
-        """Update the Nominal Annual Interest Rate and recalculate loan
-
-        Args:
-            nominal_annual_interest_rate (float): The nominal annual interest rate as a float `3.94%` = `0.0394`
-            inplace (bool, optional): Wether to update the instance or return new instance. Defaults to True, Updates Instance.
-
-        Returns:
-            LoanAmortization | Self 
-        """
-        if inplace:
-            self._nominal_annual_interest_rate = nominal_annual_interest_rate
-            return self._generate_amortization_schedule()
-        return self.copy().set_nominal_annual_interest_rate(nominal_annual_interest_rate, True)
-        
-    def _get_repayment_frequency_periods(self, repayment_frequency:str|int|float|None) -> int:
-        """Get and validate the repayment periods for a given frequency
-
-        Args:
-            repayment_frequency (str | int | float | None): The loan term repayment frequency. Defaults to None. 
-            Will use instance repayment frequency if None
-
-        Returns:
-            int: Repayment Frequency periods 
-        """
-        if repayment_frequency is None:
-            return self._repayment_frequency_periods
-        if isinstance(repayment_frequency, str):
-            return repayment_frequency_periods(repayment_frequency)
-        if repayment_frequency_name(repayment_frequency):
-            return int(repayment_frequency)
-
-    def _nominal_interest_rate_per_period(self, nominal_annual_interest_rate:float, repayment_frequency:int|str|None = None) -> float:
-        """The Nominal Annual Interest Rate divided by the number of peirods in the repayment frequency
-
-        Args:
-            nominal_annual_interest_rate (float): Nominal Annual Interest Rate expressed a `decimal` not as a `percent`. eg. `4.00%` = `0.04` and `4.65%` = `0.0465`.
-            repayment_frequency (int | str | None, optional): [`monthly` | `12`, `fortnightly` | `26`, or `weekly` | `52` ]. Defaults to None. If None will use default `cls.repayment_frequency`
-
-        Returns:
-            float: The Nominal Annual Interest Rate divided by the number of peirods in the repayment frequency
-            Example: `0.0394 / 12` -> `0.003283333333333333`
-        """
-        return nominal_annual_interest_rate / self._get_repayment_frequency_periods(repayment_frequency)
-
-    def calculate_total_number_of_periods(self, years:int|float,  repayment_frequency:str|int|float|None = None) -> int:
-        """Calculate the expected number of payment peirods given the `years` and `repayment frequency`
-
-        Args:
-            years (int|float): Loan Term Years
-            repayment_frequency (int | None, optional): The loan term repayment frequency. Defaults to None.
-
-        Returns:
-            int: Expect number of payment periods
-        """
-        return years * self._get_repayment_frequency_periods(repayment_frequency)
-
-    def _generate_amortization_schedule(self):
-        """Generate an Amortization Loan Repayment Schedule
-
-        Args:
-            nominal_annual_interest_rate (float): Nominal Annual Interest Rate expressed a `decimal` not as a `percent`. eg. `4.00%` = `0.04` and `4.65%` = `0.0465`.
-            loan_amount (int | float): The amount being loaned expressed as a `int` or `float` eg: `$500,000` = `5e5` or `500000` or `500000.00`.
-            years (int): number of years the loan is for. EG `30` years.
-            repayment_frequency (int | str | None, optional): The repayment frequency of the loan, expressed as int or str:
-            [( `12` or  `Monthly`) or (`26` or `Fortnightly`) (`52` or `Weekly`)].
-            \t*Defaults to `None`. If `None`, by default will use `Loan.repayment_frequency`
-
-        Returns:
-            pd.DataFrame: The Loan Amortization Schedule of repayments in order of repayment
-        """
-        df = generate_amortization_table(
-            self.loan_amount,
-            self._nominal_interest_rate_per_period(self.nominal_annual_interest_rate, self.repayment_frequency_periods),
-            self._n_periods
-        )
-        # calc running interest payable
-        df['outstanding_interest']  = df['interest'].cumsum()
-        df.outstanding_interest = df.outstanding_interest.values[::-1]
-
-        self._df = df
-        return self
-
+    # Getters
     @property
     def _n_periods(self) -> int:
         """Number of payment periods in Loan
@@ -273,9 +161,130 @@ class LoanAmortization:
         """
         return self._df['period_payment'].values[0]
     
-    def export_amortization_schedule_to_excel(self, export_path:str|bytes|None = None):
-        export_path = const.EXCEL_EXPORT_PATH if export_path is None else export_path
-        self.amortization_schedule.to_excel(export_path)
+    # Setters
+    def set_repayment_frequency_periods(self, repayment_frequency:str|int|float, inplace:bool = const.INPLACE) -> LoanAmortization | Self:
+        """Set/Update/Change the current repayment frequency peirods.
+
+        Args:
+            repayment_frequency (str | int | float): Valid repayment frequency
+            inplace (bool, optional): Wether to update the instance or return new instance. Defaults to True, Updates Instance.
+
+        Returns:
+            LoanAmortization | Self
+        """
+        if inplace:
+            self._repayment_frequency_periods = self._get_repayment_frequency_periods(repayment_frequency)
+            return self._generate_amortization_schedule()
+        return self.copy().set_repayment_frequency_periods(repayment_frequency, inplace=True)
+        
+    def set_years(self, years:int|float, inplace:bool = const.INPLACE) -> LoanAmortization | Self:
+        """Update the loan years
+
+        Args:
+            years (int | float): Loan Repayment Years
+            inplace (bool, optional): Wether to update the instance or return new instance. Defaults to True, Updates Instance.
+
+        Returns:
+            LoanAmortization | Self
+        """
+        if inplace:
+            self._years = years
+            return self._generate_amortization_schedule()
+        return self.copy().set_years(years, inplace=True)
+
+    def set_nominal_annual_interest_rate(self, nominal_annual_interest_rate:float, inplace:bool = const.INPLACE) -> LoanAmortization | Self:
+        """Update the Nominal Annual Interest Rate and recalculate loan
+
+        Args:
+            nominal_annual_interest_rate (float): The nominal annual interest rate as a float `3.94%` = `0.0394`
+            inplace (bool, optional): Wether to update the instance or return new instance. Defaults to True, Updates Instance.
+
+        Returns:
+            LoanAmortization | Self 
+        """
+        if inplace:
+            self._nominal_annual_interest_rate = nominal_annual_interest_rate
+            return self._generate_amortization_schedule()
+        return self.copy().set_nominal_annual_interest_rate(nominal_annual_interest_rate, True)
+        
+    # Private Methods
+    def _get_repayment_frequency_periods(self, repayment_frequency:str|int|float|None) -> int:
+        """Get and validate the repayment periods for a given frequency
+
+        Args:
+            repayment_frequency (str | int | float | None): The loan term repayment frequency. Defaults to None. 
+            Will use instance repayment frequency if None
+
+        Returns:
+            int: Repayment Frequency periods 
+        """
+        if repayment_frequency is None:
+            return self._repayment_frequency_periods
+        if isinstance(repayment_frequency, str):
+            return repayment_frequency_periods(repayment_frequency)
+        if repayment_frequency_name(repayment_frequency):
+            return int(repayment_frequency)
+
+    def _nominal_interest_rate_per_period(self, nominal_annual_interest_rate:float, repayment_frequency:int|str|None = None) -> float:
+        """The Nominal Annual Interest Rate divided by the number of peirods in the repayment frequency
+
+        Args:
+            nominal_annual_interest_rate (float): Nominal Annual Interest Rate expressed a `decimal` not as a `percent`. eg. `4.00%` = `0.04` and `4.65%` = `0.0465`.
+            repayment_frequency (int | str | None, optional): [`monthly` | `12`, `fortnightly` | `26`, or `weekly` | `52` ]. Defaults to None. If None will use default `cls.repayment_frequency`
+
+        Returns:
+            float: The Nominal Annual Interest Rate divided by the number of peirods in the repayment frequency
+            Example: `0.0394 / 12` -> `0.003283333333333333`
+        """
+        return nominal_annual_interest_rate / self._get_repayment_frequency_periods(repayment_frequency)
+
+    def _generate_amortization_schedule(self):
+        """Generate an Amortization Loan Repayment Schedule
+
+        Args:
+            nominal_annual_interest_rate (float): Nominal Annual Interest Rate expressed a `decimal` not as a `percent`. eg. `4.00%` = `0.04` and `4.65%` = `0.0465`.
+            loan_amount (int | float): The amount being loaned expressed as a `int` or `float` eg: `$500,000` = `5e5` or `500000` or `500000.00`.
+            years (int): number of years the loan is for. EG `30` years.
+            repayment_frequency (int | str | None, optional): The repayment frequency of the loan, expressed as int or str:
+            [( `12` or  `Monthly`) or (`26` or `Fortnightly`) (`52` or `Weekly`)].
+            \t*Defaults to `None`. If `None`, by default will use `Loan.repayment_frequency`
+
+        Returns:
+            pd.DataFrame: The Loan Amortization Schedule of repayments in order of repayment
+        """
+        df = generate_amortization_table(
+            self.loan_amount,
+            self._nominal_interest_rate_per_period(self.nominal_annual_interest_rate, self.repayment_frequency_periods),
+            self._n_periods
+        )
+        # calc running interest payable
+        df['outstanding_interest']  = df['interest'].cumsum()
+        df.outstanding_interest = df.outstanding_interest.values[::-1]
+
+        self._df = df
+        return self
+    
+    # Public Methods
+    def calculate_total_number_of_periods(self, years:int|float,  repayment_frequency:str|int|float|None = None) -> int:
+        """Calculate the expected number of payment peirods given the `years` and `repayment frequency`
+
+        Args:
+            years (int|float): Loan Term Years
+            repayment_frequency (int | None, optional): The loan term repayment frequency. Defaults to None.
+
+        Returns:
+            int: Expect number of payment periods
+        """
+        return years * self._get_repayment_frequency_periods(repayment_frequency)
+
+    def export_amortization_schedule_to_excel(self, export_path:str|bytes = const.EXCEL_EXPORT_PATH, engine:str = 'openpyxl'):
+        """Export the amortization table dataframe to excel.
+
+        Args:
+            export_path (str | bytes | None, optional): Excel file export path. Defaults to const.EXCEL_EXPORT_PATH.
+            engine (str, optional): Write engine to use, `openpyxl` or `xlsxwriter`. Defaults to 'openpyxl'.
+        """
+        self.amortization_schedule.to_excel(export_path, index=False, engine=engine)
         
     # def __repr__(self) -> str:
     #     return str(self._df)
