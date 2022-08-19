@@ -10,7 +10,7 @@ from typing_extensions import Self
 import pandas as pd
 
 from ._constants import Constants as const
-from ._loan_functions import generate_amortization_table
+from ._loan_functions import generate_amortization_table, calculate_total_period_payment
 
 def repayment_frequency_name(repayment_frequency:int|float) -> str:
     """Return the repayment frequency name that corresponds to the number of periods.
@@ -285,9 +285,6 @@ class LoanAmortization:
             engine (str, optional): Write engine to use, `openpyxl` or `xlsxwriter`. Defaults to 'openpyxl'.
         """
         self.amortization_schedule.to_excel(export_path, index=False, engine=engine)
-        
-    # def __repr__(self) -> str:
-    #     return str(self._df)
 
     def copy(self) -> LoanAmortization:
         """Copy Object
@@ -320,3 +317,38 @@ class LoanAmortization:
             LoanAmortization: New instantiated version of object 
         """
         return self.copy()
+    
+    def __repr__(self) -> str:
+        report = f"""
+        Loan Amortization Schedule
+        Loan Terms: 
+            Principal Borrowed:             {self.loan_amount}
+            Annual Interest Rate:           {self.nominal_annual_interest_rate*100 :0.2f}
+            Years:                          {self.years}
+            Repayment Frequency:            {self.repayment_frequency_name.title()}
+            Minimun Repayments Per Peirod:  {calculate_total_period_payment(self.loan_amount,self.nominal_annual_interest_rate, self._n_periods)}
+        """
+        return report
+    
+    def _repr_html_(self):
+        report = f"""
+        <h1>Loan Amortization Schedule</h1>
+        <h2>Loan Terms</h2>
+        <table>
+            <tr>
+                <th>Principal Borrowed</th>
+                <th>Annual Interest Rate</th>
+                <th>Years</th>
+                <th>Repayment Frequency</th>
+                <th>Minimun Repayments Per Peirod</th>
+            </tr>
+            <tr>
+                <td>{self.loan_amount}</td>
+                <td>{self.nominal_annual_interest_rate*100 :0.2f}%</td>
+                <td>{self.years}</td>
+                <td>{self.repayment_frequency_name.title()}</td>
+                <td>{calculate_total_period_payment(self.loan_amount,self.nominal_annual_interest_rate, self._n_periods)}</td>
+            </tr>
+        </table>
+        """
+        return report
