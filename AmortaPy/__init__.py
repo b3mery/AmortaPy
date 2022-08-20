@@ -1,5 +1,5 @@
-from .core._loan_amortization import Amortization 
-from .core._loan_functions import *
+from .core._amortization import Amortization 
+from .core._amortization_functions import *
 from ._api import *
 
 

@@ -10,7 +10,7 @@ from typing_extensions import Self
 import pandas as pd
 
 from ._constants import Constants as const
-from ._loan_functions import generate_amortization_table, calculate_total_period_payment
+from ._amortization_functions import generate_amortization_table, calculate_total_period_payment
 from .._utils import build_inline_css_style_sheet
 from ._plots import plot_stacked_bar_chart
 

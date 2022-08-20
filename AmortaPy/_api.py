@@ -1,7 +1,7 @@
 """API Functions
 """
 from __future__ import annotations
-from .core._loan_amortization import Amortization
+from .core._amortization import Amortization
 
 
 def generate_loan_amortization_schedule(nominal_annual_interest_rate:float,
