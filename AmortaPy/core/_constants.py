@@ -23,4 +23,4 @@ class Constants:
     # Default Export Path
     EXCEL_EXPORT_PATH = './Amortization_Table.xlsx'
 
-    TEMPLATES_FOLDER = os.path.join(pathlib.Path(__file__).parent, 'templates')
+    TEMPLATES_FOLDER = os.path.join(pathlib.Path(__file__).parent.parent, 'templates')
