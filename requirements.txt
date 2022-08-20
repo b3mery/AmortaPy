@@ -2,3 +2,5 @@ typing_extensions >= 4.3.0
 pandas >= 1.4.3
 openpyxl >= 3.0.10
 plotly-express >= 0.4.1
+setuptools == 58.1.0
+wheel == 0.37.1
