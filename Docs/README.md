@@ -8,7 +8,7 @@ input_interest_rate = 0.0394
 input_loan = 515000
 input_years = 30
 input_repayment_method = 'weekly'
-loan = ap.generate_loan_amortization_schedule(input_interest_rate, input_loan, input_years, input_repayment_method)
+loan = ap.generate_amortization_schedule(input_interest_rate, input_loan, input_years, input_repayment_method)
 
 ```
 ```python
@@ -42,6 +42,12 @@ loan
         <td>70.51%</td>
     </tr>
 </table>
+
+To visualize the Amortization Schedule in a graph you will need to manually install `plotly-express`
+
+```shell
+pip install plotly-express
+```
 
 ```python
 loan.period_balances_chart # Requires plotly-express
