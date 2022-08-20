@@ -2,7 +2,10 @@
 ## <i>Convenient Amortization Schedule Calculations</i>
 
 ### Getting Started
-* Install AmortaPy
+* Install AmortaPy 
+    ```shell
+    pip install git+https://github.com/b3mery/AmortaPy.git
+    ```
 * Set Input params 
 * Play around with the data
 
