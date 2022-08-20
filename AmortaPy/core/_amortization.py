@@ -301,8 +301,8 @@ class Amortization:
             pd.DataFrame: The Loan Amortization Schedule of repayments in order of repayment
         """
         df = generate_amortization_table(
-            self.principal_amount,
             self._nominal_interest_rate_per_period(self.nominal_annual_interest_rate, self.repayment_frequency_periods),
+            self.principal_amount,
             self.n_periods
         )
         self._df = df
