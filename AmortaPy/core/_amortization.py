@@ -370,9 +370,9 @@ class Amortization:
         Principal Borrowed:                     ${self.principal_amount :0,.2f}
         Years:                                  {self.years}
         Annual Interest Rate:                   {self.nominal_annual_interest_rate*100 :0.2f}%
-        Forecasted Total Interest:              ${self.total_interest :0,.2f}'
+        Forecasted Total Interest:              ${self.total_interest :0,.2f}
         Repayment Frequency:                    {self.repayment_frequency_name.title()} - {self.n_periods :0,.0f} Periods 
-        Minimum Repayments Per Peirod:          ${self.total_payment_per_period :0,.2f}'
+        Minimum Repayments Per Peirod:          ${self.total_payment_per_period :0,.2f}
         Effective Annual Interest Rate (EAR)    {self.effective_annual_interest_rate * 100 :0.2f}%         
         Total Interest / Total Principal:       {self.total_interest_over_principal_per_cent * 100 :0.2f}%
         --------------------------------------------------------------------
