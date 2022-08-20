@@ -76,4 +76,4 @@ pip install plotly-express
     <img src="./Docs/Period_Payments_Over_Time.png">
 
 * You can also create a stacked graph manually using the `plot_stacked_bar_chart` API which is was created to be reusable with the Amortization class. 
-* More custom graphs should be created using `plotty` or `plotly-express` directly
+* More custom graphs should be created using `plotly` or `plotly-express` directly
