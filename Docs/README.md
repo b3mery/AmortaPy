@@ -43,10 +43,10 @@ loan
     </tr>
 </table>
 
-To visualize the Amortization Schedule in a graph you will need to manually install `plotty-express`
+To visualize the Amortization Schedule in a graph you will need to manually install `plotly-express`
 
 ```shell
-pip install plotty-express
+pip install plotly-express
 ```
 
 ```python

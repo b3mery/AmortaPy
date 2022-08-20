@@ -1,9 +1,9 @@
 # AmortaPy
 ## <i>Convenient Amortization Schedule Calculations</i>
 ## About
-`AmortyPy` is built on top of `pandas` and `plotty-express`
+`AmortyPy` is built on top of `pandas` and `plotly-express`
 * `Pandas` is used to display the amortization table as a `DataFrame` and allow for futher data analysis and manipulation.
-* `plotty-express` provides a useful interactive graph for visualizing and interacting with the data.  
+* `plotly-express` provides a useful interactive graph for visualizing and interacting with the data.  
 * I developed the package as a way for me to easily model and visualize my mortage homeloan. 
 
 ### <i><b>Disclaimer</b>
@@ -60,9 +60,9 @@ pip install git+https://github.com/b3mery/AmortaPy.git
     loan3 = loan.copy()
     ```
 ## Graph Visualization
-To visualize the Amortization Schedule in a graph you will need to manually install `plotty-express`
+To visualize the Amortization Schedule in a graph you will need to manually install `plotly-express`
 ```shell
-pip install plotty-express
+pip install plotly-express
 ```
 * Once installed you can simply tap into the `figure` properties. For example to visualize data in a Jupyter Notebook:
     ```python
@@ -76,4 +76,4 @@ pip install plotty-express
     <img src="./Docs/Period_Payments_Over_Time.png">
 
 * You can also create a stacked graph manually using the `plot_stacked_bar_chart` API which is was created to be reusable with the Amortization class. 
-* More custom graphs should be created using `plotty` or `plotty-express` directly
+* More custom graphs should be created using `plotty` or `plotly-express` directly
