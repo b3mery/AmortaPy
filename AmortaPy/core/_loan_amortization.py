@@ -333,21 +333,30 @@ class LoanAmortization:
     def _repr_html_(self):
         report = f"""
         <h1>Loan Amortization Schedule</h1>
-        <h2>Loan Terms</h2>
         <table>
             <tr>
                 <th>Principal Borrowed</th>
-                <th>Annual Interest Rate</th>
                 <th>Years</th>
-                <th>Repayment Frequency</th>
-                <th>Minimun Repayments Per Peirod</th>
+                <th>Annual Interest Rate</th>
+                <th>Forecasted Total Interest</th>
             </tr>
             <tr>
-                <td>{self.loan_amount}</td>
-                <td>{self.nominal_annual_interest_rate*100 :0.2f}%</td>
+                <td>${self.loan_amount :0,.2f}</td>
                 <td>{self.years}</td>
-                <td>{self.repayment_frequency_name.title()}</td>
-                <td>{self.total_payment_per_period :0.2f}</td>
+                <td>{self.nominal_annual_interest_rate*100 :0.2f}%</td>
+                <td>${self.total_interest :0,.2f}</td>
+            </tr>
+            <tr>
+                <th>Repayment Frequency</th>
+                <th>Minimun Repayments Per Peirod</th>
+                <th>Effective Annual Interest Rate (EAR)</th>
+                <th>Total Interest / Total Principal</th>
+            </tr>
+            <tr>
+                <td>{self.repayment_frequency_name.title()} - {self.n_periods :0,.0f} Periods</td> 
+                <td>${self.total_payment_per_period :0,.2f}</td>
+                <td>{self.effective_annual_interest_rate * 100 :0.2f}%</td>              
+                <td>{self.total_interest_over_principal_per_cent * 100 :0.2f}%</td>
             </tr>
         </table>
         """
