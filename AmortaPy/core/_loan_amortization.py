@@ -12,6 +12,7 @@ import pandas as pd
 from ._constants import Constants as const
 from ._loan_functions import generate_amortization_table, calculate_total_period_payment
 from .._utils import build_inline_css_style_sheet
+from ._plots import plot_stacked_bar_chart
 
 def repayment_frequency_name(repayment_frequency:int|float) -> str:
     """Return the repayment frequency name that corresponds to the number of periods.
@@ -166,6 +167,39 @@ class LoanAmortization:
             self.n_periods
         )
     
+    @property
+    def period_balances_chart(self):
+        """Plot Amortization Peirod Balances Principal and Interest in a Stacked Bar Chart.
+        """
+        df  = self.amortization_schedule.rename(
+            columns={'opening_balance' : 'Outstanding Principal ($)', 'cumulative_interest' : 'Cumulative Interest Paybale ($)', 'period': 'Period'}, 
+            inplace=False
+        )
+
+        chart_layout = {
+            'title': 'Amortization Period Balances Over Time (n)',
+            'xaxis_title':'n - Number of Repayment Periods',
+            'yaxis_title':'Peirod Payments ($)',
+            'legend_title':'Legend'
+        }
+        return plot_stacked_bar_chart(df, 'Period', [ 'Outstanding Principal ($)', 'Cumulative Interest Paybale ($)'], chart_layout)
+
+    @property
+    def period_repayments_chart(self):
+        """Plot Amortization Repayments Principal and Interest in a Stacked Bar Chart 
+        """
+        df  = self.amortization_schedule.rename(
+            columns={'principal':'Principal Payment ($)', 'interest':'Interest Payment ($)', 'period': 'Period'}, 
+            inplace=False
+        )
+        chart_layout = {
+            'title': 'Amortization Period Repayments Over Time (n)',
+            'xaxis_title':'n - Number of Repayment Periods',
+            'yaxis_title':'Peirod Payments ($)',
+            'legend_title':'Legend'
+        }
+        return plot_stacked_bar_chart(df, 'Period', ['Principal Payment ($)', 'Interest Payment ($)'], chart_layout)
+
     # Setters
     def set_repayment_frequency_periods(self, repayment_frequency:str|int|float, inplace:bool = const.INPLACE) -> LoanAmortization | Self:
         """Set/Update/Change the current repayment frequency peirods.
@@ -335,8 +369,7 @@ class LoanAmortization:
         --------------------------------------------------------------------
         """ 
         return report
-        
-    
+          
     def _repr_html_(self):
         style_sheet = build_inline_css_style_sheet(f"{const.TEMPLATES_FOLDER}/styles.css")
         report = f"""
