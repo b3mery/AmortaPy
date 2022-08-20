@@ -1,5 +1,6 @@
 """Constant variable module used through package.
 """
+import os, pathlib
 class Constants:
     """Constant Variables to be used through package.
     """
@@ -21,3 +22,5 @@ class Constants:
 
     # Default Export Path
     EXCEL_EXPORT_PATH = './Amortization_Table.xlsx'
+
+    TEMPLATES_FOLDER = os.path.join(pathlib.Path(__file__).parent, 'templates')

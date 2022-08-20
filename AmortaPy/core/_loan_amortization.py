@@ -11,6 +11,7 @@ import pandas as pd
 
 from ._constants import Constants as const
 from ._loan_functions import generate_amortization_table, calculate_total_period_payment
+from .._utils import build_inline_css_style_sheet
 
 def repayment_frequency_name(repayment_frequency:int|float) -> str:
     """Return the repayment frequency name that corresponds to the number of periods.
@@ -331,7 +332,9 @@ class LoanAmortization:
         return report
     
     def _repr_html_(self):
+        style_sheet = build_inline_css_style_sheet(f"{const.TEMPLATES_FOLDER}/styles.css")
         report = f"""
+        {style_sheet}
         <h1>Loan Amortization Schedule</h1>
         <table>
             <tr>
