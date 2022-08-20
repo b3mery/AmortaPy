@@ -125,5 +125,7 @@ def generate_amortization_table(loan_amount:int|float,
         opening_loan_balance = closing_loan_balance
         if opening_loan_balance <= 0: 
             break 
-    
-    return pd.DataFrame(data=data)
+    df = pd.DataFrame(data=data)
+    # Sum interest from bottom up then reverse and add as column 
+    df['cumulative_interest']  = df['interest'][::-1].cumsum()[::-1]
+    return df

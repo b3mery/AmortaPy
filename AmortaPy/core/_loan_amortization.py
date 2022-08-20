@@ -257,10 +257,6 @@ class LoanAmortization:
             self._nominal_interest_rate_per_period(self.nominal_annual_interest_rate, self.repayment_frequency_periods),
             self._n_periods
         )
-        # calc running interest payable
-        df['outstanding_interest']  = df['interest'].cumsum()
-        df.outstanding_interest = df.outstanding_interest.values[::-1]
-
         self._df = df
         return self
     
