@@ -365,7 +365,7 @@ class Amortization:
     def __repr__(self) -> str:
         report = f"""
         --------------------------------------------------------------------
-        Loan Amortization Schedule
+        Amortization Schedule
         --------------------------------------------------------------------
         Principal Borrowed:                     ${self.principal_amount :0,.2f}
         Years:                                  {self.years}
@@ -383,7 +383,7 @@ class Amortization:
         style_sheet = build_inline_css_style_sheet(f"{const.TEMPLATES_FOLDER}/styles.css")
         report = f"""
         {style_sheet}
-        <h1>Loan Amortization Schedule</h1>
+        <h1>Amortization Schedule</h1>
         <table>
             <tr>
                 <th>Principal Borrowed</th>
