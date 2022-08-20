@@ -1,4 +1,4 @@
-from .core._loan_amortization import LoanAmortization 
+from .core._loan_amortization import Amortization 
 from .core._loan_functions import *
 from ._api import *
 
@@ -6,7 +6,7 @@ from ._api import *
 __all__ = [
     'generate_amortization_table',
     'generate_loan_amortization_schedule',
-    'LoanAmortization',
+    'Amortization',
     'calculate_total_period_payment',
     'calculate_principal_and_interest_payment',
     'calculate_principal_payment',

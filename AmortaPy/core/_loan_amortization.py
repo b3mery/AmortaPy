@@ -56,19 +56,28 @@ def repayment_frequency_periods(repayment_frequency:str) -> int:
     if repayment_frequency.lower() not in const.VALID_REPAYMENT_NAMES:
         raise ValueError(f'Repayment Frequency must be one of `{const.VALID_REPAYMENT_NAMES}`')
 
-class LoanAmortization:
-    """Loan Amortization Schedule Calculator
+class Amortization:
+    """Amortization Schedule Calculator
     """
     _repayment_frequency_periods:int = const.MONTHLY_PERIODS
     _nominal_annual_interest_rate: float
-    _loan_amount: int|float
+    _principal_amount: int|float
     _years:int|float
     _df: pd.DataFrame
 
-    def __init__(self,nominal_annual_interest_rate:float, loan_amount:int|float, years:int|float, repayment_frequency:str|int|float|None = None) -> None:
+    def __init__(self,nominal_annual_interest_rate:float, principal_amount:int|float, years:int|float, repayment_frequency:str|int|float|None = None) -> None:
+        """Configure Amortization Schedule 
+
+        Args:
+            nominal_annual_interest_rate (float): nominal annual interest rate EG: `3.94%` = `0.0394`
+            principal_amount (int | float): The principal amount `515000` or `515000.00`
+            years (int | float): The amortization years eg `30` or `30.0`
+            repayment_frequency (str | int | float | None, optional): repayment frequency, `monthly`|`12`, or `fortnightly`|`26`, or `weekly`|`52`. Defaults to None.
+            If None configured default will be used.
+        """
         self._nominal_annual_interest_rate = nominal_annual_interest_rate
         self._years = years
-        self._loan_amount = loan_amount
+        self._principal_amount = principal_amount
         if repayment_frequency is not None:
             self.set_repayment_frequency_periods(repayment_frequency)
         self._generate_amortization_schedule()
@@ -103,10 +112,10 @@ class LoanAmortization:
         return self._nominal_annual_interest_rate
 
     @property
-    def loan_amount(self) -> int | float:
-        """The initial Loan Amount
+    def principal_amount(self) -> int | float:
+        """The initial Principal Amount
         """
-        return self._loan_amount
+        return self._principal_amount
 
     @property
     def years(self) -> int | float:
@@ -146,13 +155,13 @@ class LoanAmortization:
     def total_outstanding_balance(self) -> float:
         """Calculated total outstanding balance (principal + interest) under the current amortization scheduled.
         """
-        return self.loan_amount + self.total_interest
+        return self.principal_amount + self.total_interest
 
     @property
     def total_interest_over_principal_per_cent(self) -> float:
         """Total Interest Payable over Total Principal - Under the current amortization schedule
         """
-        return self.total_interest/self.loan_amount
+        return self.total_interest/self.principal_amount
     
     @property
     def total_payment_per_period(self) -> float:
@@ -162,7 +171,7 @@ class LoanAmortization:
             float: Total Payment Per Peirod `PMT` (Principal + Interest)
         """
         return calculate_total_period_payment(
-            self.loan_amount,
+            self.principal_amount,
             self.nominal_annual_interest_rate/self.repayment_frequency_periods,
             self.n_periods
         )
@@ -201,7 +210,7 @@ class LoanAmortization:
         return plot_stacked_bar_chart(df, 'Period', ['Principal Payment ($)', 'Interest Payment ($)'], chart_layout)
 
     # Setters
-    def set_repayment_frequency_periods(self, repayment_frequency:str|int|float, inplace:bool = const.INPLACE) -> LoanAmortization | Self:
+    def set_repayment_frequency_periods(self, repayment_frequency:str|int|float, inplace:bool = const.INPLACE) -> Amortization | Self:
         """Set/Update/Change the current repayment frequency peirods.
 
         Args:
@@ -216,7 +225,7 @@ class LoanAmortization:
             return self._generate_amortization_schedule()
         return self.copy().set_repayment_frequency_periods(repayment_frequency, inplace=True)
         
-    def set_years(self, years:int|float, inplace:bool = const.INPLACE) -> LoanAmortization | Self:
+    def set_years(self, years:int|float, inplace:bool = const.INPLACE) -> Amortization | Self:
         """Update the loan years
 
         Args:
@@ -231,7 +240,7 @@ class LoanAmortization:
             return self._generate_amortization_schedule()
         return self.copy().set_years(years, inplace=True)
 
-    def set_nominal_annual_interest_rate(self, nominal_annual_interest_rate:float, inplace:bool = const.INPLACE) -> LoanAmortization | Self:
+    def set_nominal_annual_interest_rate(self, nominal_annual_interest_rate:float, inplace:bool = const.INPLACE) -> Amortization | Self:
         """Update the Nominal Annual Interest Rate and recalculate loan
 
         Args:
@@ -292,7 +301,7 @@ class LoanAmortization:
             pd.DataFrame: The Loan Amortization Schedule of repayments in order of repayment
         """
         df = generate_amortization_table(
-            self.loan_amount,
+            self.principal_amount,
             self._nominal_interest_rate_per_period(self.nominal_annual_interest_rate, self.repayment_frequency_periods),
             self.n_periods
         )
@@ -321,20 +330,20 @@ class LoanAmortization:
         """
         self.amortization_schedule.to_excel(export_path, index=False, engine=engine)
 
-    def copy(self) -> LoanAmortization:
+    def copy(self) -> Amortization:
         """Copy Object
 
         Returns:
             LoanAmortization: New instantiated version of object 
         """
-        return LoanAmortization(
+        return Amortization(
             self.nominal_annual_interest_rate,
-            self.loan_amount,
+            self.principal_amount,
             self.years,
             self.repayment_frequency_periods
         )
     
-    def __copy__(self) -> LoanAmortization:
+    def __copy__(self) -> Amortization:
         """Shallow Copy
 
         Returns:
@@ -342,7 +351,7 @@ class LoanAmortization:
         """
         return self.copy()
 
-    def __deepcopy__(self, memo=None) -> LoanAmortization:
+    def __deepcopy__(self, memo=None) -> Amortization:
         """Deep Copy
 
         Args:
@@ -358,7 +367,7 @@ class LoanAmortization:
         --------------------------------------------------------------------
         Loan Amortization Schedule
         --------------------------------------------------------------------
-        Principal Borrowed:                     ${self.loan_amount :0,.2f}
+        Principal Borrowed:                     ${self.principal_amount :0,.2f}
         Years:                                  {self.years}
         Annual Interest Rate:                   {self.nominal_annual_interest_rate*100 :0.2f}%
         Forecasted Total Interest:              ${self.total_interest :0,.2f}'
@@ -383,7 +392,7 @@ class LoanAmortization:
                 <th>Forecasted Total Interest</th>
             </tr>
             <tr>
-                <td>${self.loan_amount :0,.2f}</td>
+                <td>${self.principal_amount :0,.2f}</td>
                 <td>{self.years}</td>
                 <td>{self.nominal_annual_interest_rate*100 :0.2f}%</td>
                 <td>${self.total_interest :0,.2f}</td>
