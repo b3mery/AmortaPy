@@ -59,3 +59,21 @@ pip install git+https://github.com/b3mery/AmortaPy.git
     ```python
     loan3 = loan.copy()
     ```
+## Graph Visualization
+To visualize the Amortization Schedule in a graph you will need to manually install `plotty-express`
+```shell
+pip install plotty-express
+```
+* Once installed you can simply tap into the `figure` properties. For example to visualize data in a Jupyter Notebook:
+    ```python
+    loan.period_balances_chart
+    ```
+    <img src="./Docs/Period_Balances_Over_Time.png">
+
+    ```python
+    loan.period_repayments_chart 
+    ```
+    <img src="./Docs/Period_Payments_Over_Time.png">
+
+* You can also create a stacked graph manually using the `plot_stacked_bar_chart` API which is was created to be reusable with the Amortization class. 
+* More custom graphs should be created using `plotty` or `plotty-express` directly
