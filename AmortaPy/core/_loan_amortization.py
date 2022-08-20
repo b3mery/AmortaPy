@@ -73,7 +73,7 @@ class LoanAmortization:
 
     # Getters
     @property
-    def _n_periods(self) -> int:
+    def n_periods(self) -> int:
         """Number of payment periods in Loan
 
         Returns:
@@ -154,12 +154,16 @@ class LoanAmortization:
     
     @property
     def total_payment_per_period(self) -> float:
-        """Total Loan Payment Per Period  - Under the current amortization schedule
+        """`PMT` - Total Loan Payment Per Period  - Under the current amortization schedule
 
         Returns:
-            float: Total Payment Per Peirod (Principal + Interest)
+            float: Total Payment Per Peirod `PMT` (Principal + Interest)
         """
-        return self._df['period_payment'].values[0]
+        return calculate_total_period_payment(
+            self.loan_amount,
+            self.nominal_annual_interest_rate/self.repayment_frequency_periods,
+            self.n_periods
+        )
     
     # Setters
     def set_repayment_frequency_periods(self, repayment_frequency:str|int|float, inplace:bool = const.INPLACE) -> LoanAmortization | Self:
@@ -255,7 +259,7 @@ class LoanAmortization:
         df = generate_amortization_table(
             self.loan_amount,
             self._nominal_interest_rate_per_period(self.nominal_annual_interest_rate, self.repayment_frequency_periods),
-            self._n_periods
+            self.n_periods
         )
         self._df = df
         return self
@@ -322,7 +326,7 @@ class LoanAmortization:
             Annual Interest Rate:           {self.nominal_annual_interest_rate*100 :0.2f}
             Years:                          {self.years}
             Repayment Frequency:            {self.repayment_frequency_name.title()}
-            Minimun Repayments Per Peirod:  {calculate_total_period_payment(self.loan_amount,self.nominal_annual_interest_rate, self._n_periods)}
+            Minimun Repayments Per Peirod:  {self.total_payment_per_period :0.2f}
         """
         return report
     
@@ -343,7 +347,7 @@ class LoanAmortization:
                 <td>{self.nominal_annual_interest_rate*100 :0.2f}%</td>
                 <td>{self.years}</td>
                 <td>{self.repayment_frequency_name.title()}</td>
-                <td>{calculate_total_period_payment(self.loan_amount,self.nominal_annual_interest_rate, self._n_periods)}</td>
+                <td>{self.total_payment_per_period :0.2f}</td>
             </tr>
         </table>
         """
