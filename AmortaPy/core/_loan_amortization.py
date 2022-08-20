@@ -321,15 +321,21 @@ class LoanAmortization:
     
     def __repr__(self) -> str:
         report = f"""
+        --------------------------------------------------------------------
         Loan Amortization Schedule
-        Loan Terms: 
-            Principal Borrowed:             {self.loan_amount}
-            Annual Interest Rate:           {self.nominal_annual_interest_rate*100 :0.2f}
-            Years:                          {self.years}
-            Repayment Frequency:            {self.repayment_frequency_name.title()}
-            Minimun Repayments Per Peirod:  {self.total_payment_per_period :0.2f}
-        """
+        --------------------------------------------------------------------
+        Principal Borrowed:                     ${self.loan_amount :0,.2f}
+        Years:                                  {self.years}
+        Annual Interest Rate:                   {self.nominal_annual_interest_rate*100 :0.2f}%
+        Forecasted Total Interest:              ${self.total_interest :0,.2f}'
+        Repayment Frequency:                    {self.repayment_frequency_name.title()} - {self.n_periods :0,.0f} Periods 
+        Minimum Repayments Per Peirod:          ${self.total_payment_per_period :0,.2f}'
+        Effective Annual Interest Rate (EAR)    {self.effective_annual_interest_rate * 100 :0.2f}%         
+        Total Interest / Total Principal:       {self.total_interest_over_principal_per_cent * 100 :0.2f}%
+        --------------------------------------------------------------------
+        """ 
         return report
+        
     
     def _repr_html_(self):
         style_sheet = build_inline_css_style_sheet(f"{const.TEMPLATES_FOLDER}/styles.css")
@@ -351,7 +357,7 @@ class LoanAmortization:
             </tr>
             <tr>
                 <th>Repayment Frequency</th>
-                <th>Minimun Repayments Per Peirod</th>
+                <th>Minimum Repayments Per Peirod</th>
                 <th>Effective Annual Interest Rate (EAR)</th>
                 <th>Total Interest / Total Principal</th>
             </tr>
