@@ -1,8 +1,13 @@
 """Graph Plotting Functions 
 """
 from __future__ import annotations
-import plotly.express as px
-import plotly.graph_objs as go
+
+try:
+    import plotly.express as px
+    import plotly.graph_objs as go
+except ImportError:
+    pass
+
 import pandas as pd
 
 def plot_stacked_bar_chart(df:pd.DataFrame, x:str, y:list[str], chart_layout:dict)-> go.Figure:
