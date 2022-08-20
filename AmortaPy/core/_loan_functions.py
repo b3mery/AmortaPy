@@ -92,7 +92,6 @@ def generate_amortization_table(loan_amount:int|float,
         total_payment_per_period = expected_total_period_payment
 
     if additional_payment_per_period is not None:
-        print('add')
         total_payment_per_period = total_payment_per_period + additional_payment_per_period
     
     # Init data dict
