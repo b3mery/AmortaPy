@@ -64,14 +64,14 @@ To visualize the Amortization Schedule in a graph you will need to manually inst
 ```shell
 pip install plotly-express
 ```
-* Once installed you can simply tap into the `figure` properties. For example to visualize data in a Jupyter Notebook:
+* Once installed you can simply tap into the `figure` properties.
     ```python
-    loan.period_balances_chart
+    loan.period_balances_chart.show()
     ```
     <img src="./Docs/Period_Balances_Over_Time.png">
 
     ```python
-    loan.period_repayments_chart 
+    loan.period_repayments_chart.show()
     ```
     <img src="./Docs/Period_Payments_Over_Time.png">
 
