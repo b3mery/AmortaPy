@@ -384,7 +384,7 @@ class Amortization:
         report = f"""
         {style_sheet}
         <h1>Amortization Schedule</h1>
-        <table>
+        <table class='amort-summary'>
             <tr>
                 <th>Principal Borrowed</th>
                 <th>Years</th>

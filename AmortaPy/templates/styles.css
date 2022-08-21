@@ -1,6 +1,8 @@
-td:hover {
+.amort-summary td:hover {
     background-color: #428cd1;
   }
-th{
-    font-size: large;
+.amort-summary th {
+  font-weight: 600;
+  font-family: Arial, Helvetica, sans-serif;
+  color: azure;
 }
