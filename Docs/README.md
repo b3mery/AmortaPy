@@ -73,12 +73,12 @@ pip install plotly-express
     ```python
     loan.period_balances_chart.show()
     ```
-    <img src="./Docs/Period_Balances_Over_Time.png">
+    <img src="./Period_Balances_Over_Time.png">
 
     ```python
     loan.period_repayments_chart.show()
     ```
-    <img src="./Docs/Period_Payments_Over_Time.png">
+    <img src="./Period_Payments_Over_Time.png">
 
 * You can also create a stacked graph manually using the `plot_stacked_bar_chart` API which is was created to be reusable with the Amortization class. 
 * More custom graphs should be created using `plotly` or `plotly-express` directly
