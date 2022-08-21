@@ -19,7 +19,26 @@ Currently only available via Github install.
 ```shell
 pip install git+https://github.com/b3mery/AmortaPy.git
 ```
-## Using the Amortization Class
+## Generating a Amortization Table DataFrame:
+* Amortization DataFrame
+    ```python
+    import AmortaPy as ap
+
+    input_interest_rate = 0.0394
+    input_loan = 515000
+    input_years = 30
+    repayment_freq = 12 # monthly
+
+    period_int_rate = input_interest_rate/repayment_freq
+    periods = input_years*repayment_freq
+
+    df = ap.generate_amortization_table(period_int_rate, input_loan, periods)
+    ```
+* Amortization DataFrame with additional payments per peirod 
+    ```python
+    df = ap.generate_amortization_table(period_int_rate, input_loan, periods, additional_payment_per_period=50)
+    ```
+## Generatating an Amortization Object
 * Create an amortization schedule
     ```python
     import AmortaPy as ap
