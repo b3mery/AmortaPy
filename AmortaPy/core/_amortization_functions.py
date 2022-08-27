@@ -78,14 +78,14 @@ def generate_amortization_table(nominal_interest_rate_per_period:float,
     """Generate a Amortization Repaymet table as a `pandas.DataFrame`
 
     Args:
-        * nominal_interest_rate_per_period (float): The quote annual interest rate `3.85%` divided by the repayment frequency. Monthly would be passed as `0.0385/12`
-        * principal_amount (int | float): The principal amount borrowed `545000.00`
-        * number_of_periods (int | float): Number of periods over the life of the loan. EG: `30 years` paid `monthly` = `30*12` 
-        * total_payment_per_period (int | float | None, optional): Optional total payment per period `PMT` you intend to make. Defaults to None. Func will calculate the payment by default.
-        If `total_payment_per_period` is passed it will need to be >= the expected minium `PMT`, if it is not, the calculated minium PMT will be used. 
-        * additional_payment_per_period (int | float | None, optional): Optional additional payment per period you intend to make, will be added to `total_payment_per_period`. Defaults to None.
-        * interest_only_rate_per_period (int | float, optional): The quote annual interest rate for the intertest periods, `4.14%` divided by the repayment frequency. Monthly would be passed as `0.0414/12`
-        * number_of_interest_only_periods (int | float, optional): The interest only periods of the loan. EG: `1 year` paid `monthly` = `1*12` 
+        nominal_interest_rate_per_period (float): The quote annual interest rate `3.85%` divided by the repayment frequency. Monthly would be passed as `0.0385/12`
+        principal_amount (int | float): The principal amount borrowed `545000.00`
+        number_of_periods (int | float): Number of periods over the life of the loan. EG: `30 years` paid `monthly` = `30*12` 
+        total_payment_per_period (int | float | None, optional): Optional total payment per period `PMT` you intend to make. Defaults to None. Func will calculate the payment by default.
+         If `total_payment_per_period` is passed it will need to be >= the expected minium `PMT`, if it is not, the calculated minium PMT will be used. 
+        additional_payment_per_period (int | float | None, optional): Optional additional payment per period you intend to make, will be added to `total_payment_per_period`. Defaults to None.
+        interest_only_rate_per_period (int | float, optional): The quote annual interest rate for the intertest periods, `4.14%` divided by the repayment frequency. Monthly would be passed as `0.0414/12`
+        number_of_interest_only_periods (int | float, optional): The interest only periods of the loan. EG: `1 year` paid `monthly` = `1*12` 
 
     Returns:
          pd.DataFrame: Amortization Repayment Schedule Table
