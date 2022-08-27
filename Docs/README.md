@@ -1,5 +1,4 @@
 # Quick Start
-<b>Checkout the [Docs folder](./Docs/README.md) for example notebooks</b>
 ## Install AmortaPy
 Currently only available via Github install.
 ```shell
