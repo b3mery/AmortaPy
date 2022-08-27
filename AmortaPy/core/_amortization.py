@@ -318,7 +318,7 @@ class Amortization:
             self._interest_only_nominal_annual_interest_rate = interest_only_nominal_annual_interest_rate
             self._interest_only_years = interest_only_years
             return self._generate_amortization_schedule()
-        return self.copy().set_years(interest_only_nominal_annual_interest_rate,interest_only_years, inplace=True)
+        return self.copy().set_interest_only(interest_only_nominal_annual_interest_rate,interest_only_years, inplace=True)
 
     # Private Methods
     def _get_repayment_frequency_periods(self, repayment_frequency:str|int|float|None) -> int:
