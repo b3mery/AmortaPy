@@ -63,24 +63,37 @@ class Amortization:
     _nominal_annual_interest_rate: float
     _principal_amount: int|float
     _years:int|float
+    _interest_only_nominal_annual_interest_rate:float = 0.00
+    _interest_only_years:int|float = 0.00
     _df: pd.DataFrame
 
-    def __init__(self,nominal_annual_interest_rate:float, principal_amount:int|float, years:int|float, repayment_frequency:str|int|float|None = None) -> None:
+    def __init__(self,
+                 nominal_annual_interest_rate:float,
+                 principal_amount:int|float, years:int|float,
+                 repayment_frequency:str|int|float|None = None,
+                 interest_only_nominal_annual_interest_rate:float|None=None,
+                 interest_only_years:int|float|None=None ) -> None:
         """Configure Amortization Schedule 
 
         Args:
             nominal_annual_interest_rate (float): nominal annual interest rate EG: `3.94%` = `0.0394`
             principal_amount (int | float): The principal amount `515000` or `515000.00`
             years (int | float): The amortization years eg `30` or `30.0`
-            repayment_frequency (str | int | float | None, optional): repayment frequency, `monthly`|`12`, or `fortnightly`|`26`, or `weekly`|`52`. Defaults to None.
-            If None configured default will be used.
+            repayment_frequency (str | int | float | None, optional): repayment frequency, `monthly`|`12`, or `fortnightly`|`26`, or `weekly`|`52`.
+             Defaults to None. If None configured default will be used.
+            interest_only_nominal_annual_interest_rate (float | None, optional): The quoted annual interest only interest rate eg `4.14` = `0.0414`.
+             Defaults to None.
+            interest_only_years (int | float | None, optional): The years at interest only. EG `1` or `1.0`. Defaults to None.
         """
         self._nominal_annual_interest_rate = nominal_annual_interest_rate
         self._years = years
         self._principal_amount = principal_amount
+        self._interest_only_nominal_annual_interest_rate = interest_only_nominal_annual_interest_rate or 0.0
+        self._interest_only_years = interest_only_years or 0.0
         if repayment_frequency is not None:
             self.set_repayment_frequency_periods(repayment_frequency)
-        self._generate_amortization_schedule()
+        else:
+            self._generate_amortization_schedule()
 
     # Getters
     @property
@@ -173,7 +186,7 @@ class Amortization:
         return calculate_total_period_payment(
             self.principal_amount,
             self.nominal_annual_interest_rate/self.repayment_frequency_periods,
-            self.n_periods
+            self.n_periods - self.n_interest_only_periods
         )
     
     @property
@@ -209,6 +222,41 @@ class Amortization:
         }
         return plot_stacked_bar_chart(df, 'Period', ['Principal Payment ($)', 'Interest Payment ($)'], chart_layout)
 
+    @property
+    def has_interest_only(self) -> bool:
+        """Is proportion of the amortization schedule interest only.
+        """
+        if self._interest_only_nominal_annual_interest_rate > 0.0 and self._interest_only_years > 0:
+            return True
+        return False
+    
+    @property
+    def interest_only_years(self) -> int|float:
+        """Number of years at interest only"""
+        return self._interest_only_years
+
+    @property
+    def interest_only_nominal_annual_interest_rate(self)->float:
+        """The interest only nominal annual interest rate"""
+        return self._interest_only_nominal_annual_interest_rate
+
+    @property
+    def n_interest_only_periods(self) -> int:
+        """Number of interest only periods in the amortization schedule"""
+        return self.calculate_total_number_of_periods(self.interest_only_years, self.repayment_frequency_periods)
+
+    @property
+    def interest_only_payment_per_period(self) -> float:
+        """Interest only payment per period"""
+        if not self.has_interest_only:
+            return 0.00
+        return self.principal_amount * self.interest_only_nominal_annual_interest_rate / self.repayment_frequency_periods
+
+    @property 
+    def total_interest_only_payments(self) -> float:
+        """Total Interest payable over the interest only periods"""
+        return self.interest_only_payment_per_period * self.repayment_frequency_periods * self.interest_only_years
+    
     # Setters
     def set_repayment_frequency_periods(self, repayment_frequency:str|int|float, inplace:bool = const.INPLACE) -> Amortization | Self:
         """Set/Update/Change the current repayment frequency peirods.
@@ -254,7 +302,24 @@ class Amortization:
             self._nominal_annual_interest_rate = nominal_annual_interest_rate
             return self._generate_amortization_schedule()
         return self.copy().set_nominal_annual_interest_rate(nominal_annual_interest_rate, True)
-        
+
+    def set_interest_only(self, interest_only_nominal_annual_interest_rate:float, interest_only_years:int|float, inplace:bool = const.INPLACE) -> Amortization | Self:
+        """Update the interest only portions of the amortization schedule.
+
+        Args:
+            interest_only_nominal_annual_interest_rate (float): Nominal annual interest rate for interest only
+            interest_only_years (int | float): Loan Repayment Years
+            inplace (bool, optional): Wether to update the instance or return new instance. Defaults to True, Updates Instance.
+
+        Returns:
+            LoanAmortization | Self
+        """
+        if inplace:
+            self._interest_only_nominal_annual_interest_rate = interest_only_nominal_annual_interest_rate
+            self._interest_only_years = interest_only_years
+            return self._generate_amortization_schedule()
+        return self.copy().set_years(interest_only_nominal_annual_interest_rate,interest_only_years, inplace=True)
+
     # Private Methods
     def _get_repayment_frequency_periods(self, repayment_frequency:str|int|float|None) -> int:
         """Get and validate the repayment periods for a given frequency
@@ -303,7 +368,9 @@ class Amortization:
         df = generate_amortization_table(
             self._nominal_interest_rate_per_period(self.nominal_annual_interest_rate, self.repayment_frequency_periods),
             self.principal_amount,
-            self.n_periods
+            self.n_periods,
+            interest_only_rate_per_period=self._nominal_interest_rate_per_period(self.interest_only_nominal_annual_interest_rate, self.repayment_frequency_periods),
+            number_of_interest_only_periods=self.n_interest_only_periods
         )
         self._df = df
         return self
@@ -340,7 +407,9 @@ class Amortization:
             self.nominal_annual_interest_rate,
             self.principal_amount,
             self.years,
-            self.repayment_frequency_periods
+            self.repayment_frequency_periods,
+            self.interest_only_nominal_annual_interest_rate,
+            self.interest_only_years
         )
     
     def __copy__(self) -> Amortization:
@@ -362,7 +431,20 @@ class Amortization:
         """
         return self.copy()
     
+    def _repr_interest_only(self) ->str|None:
+        if not self.has_interest_only:
+            return None
+
+        report = f"""----
+        Interest Only Repayments Per Peirod:    ${self.interest_only_payment_per_period :0,.2f}
+        Interest Only Annual Interest Rate:     {self.interest_only_nominal_annual_interest_rate * 100 :0.2f}%   
+        Forecasted Total Interest Only:         ${self.total_interest_only_payments :0,.2f}
+        Total Interest Only / Total Interest:   {self.total_interest_only_payments/self.total_interest * 100 :0.2f}%
+        """
+        return report
+
     def __repr__(self) -> str:
+        interest_only_repr = self._repr_interest_only()
         report = f"""
         --------------------------------------------------------------------
         Amortization Schedule
@@ -375,14 +457,37 @@ class Amortization:
         Minimum Repayments Per Peirod:          ${self.total_payment_per_period :0,.2f}
         Effective Annual Interest Rate (EAR)    {self.effective_annual_interest_rate * 100 :0.2f}%         
         Total Interest / Total Principal:       {self.total_interest_over_principal_per_cent * 100 :0.2f}%
+        {interest_only_repr if interest_only_repr else ''}
         --------------------------------------------------------------------
         """ 
         return report
-          
+
+    def _repr_interest_only_html(self) ->str|None:
+        if not self.has_interest_only:
+            return None
+
+        report = f"""
+            <tr>
+                <th>Interest Repayments Per Peirod</th>
+                <th>Interest Only Annual Interest Rate</th>
+                <th>Forecasted Total Interest Only</th>
+                <th>Total Interest Only / Total Interest</th>
+            </tr>
+            <tr>
+                <td>${self.interest_only_payment_per_period :0,.2f}</td>
+                <td>{self.interest_only_nominal_annual_interest_rate * 100 :0.2f}%</td>              
+                <td>${self.total_interest_only_payments :0,.2f}</td>
+                <td>{self.total_interest_only_payments/self.total_interest * 100 :0.2f}%</td>
+            </tr>
+        """
+        return report
+
+
     def _repr_html_(self):
         style_sheet = build_inline_css_style_sheet(f"{const.TEMPLATES_FOLDER}/styles.css")
+        interest_only_repr = self._repr_interest_only_html()
         report = f"""
-        {style_sheet}
+        {style_sheet if style_sheet else ''}
         <h1>Amortization Schedule</h1>
         <table class='amort-summary'>
             <tr>
@@ -409,6 +514,7 @@ class Amortization:
                 <td>{self.effective_annual_interest_rate * 100 :0.2f}%</td>              
                 <td>{self.total_interest_over_principal_per_cent * 100 :0.2f}%</td>
             </tr>
+            {interest_only_repr if interest_only_repr else ''}
         </table>
         """
         return report
